@@ -31,6 +31,36 @@ typedef struct SharedMemory{
     int read_count;
 } SharedMemory;
 
+void init(
+	SharedMemory **shared_memory,
+	sem_t **shared_memory_semaphore,
+	sem_t **empty_semaphore
+){
+	int shared_memory_id = getSharedMemory(
+        SHARED_MEMORY_KEY,
+        sizeof(SharedMemory),
+        USER_AND_GROUP|IPC_CREAT
+    );
+    *shared_memory = attachSharedMemory(
+        shared_memory_id,
+        NULL,
+        NO_FLAGS
+    );
+       
+    *shared_memory_semaphore = sem_open(
+    	SHARED_MEMORY_OCCUPIED,
+    	O_CREAT,
+    	USER_AND_GROUP,
+    	1
+    );
+	*empty_semaphore = sem_open(
+    	EMPTY,
+    	O_CREAT,
+    	USER_AND_GROUP,
+    	0
+    );
+}
+
 void clear(){
 	int shared_memory_id = getSharedMemory(
         SHARED_MEMORY_KEY,
